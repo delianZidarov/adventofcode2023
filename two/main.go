@@ -11,5 +11,7 @@ func main (){
 		fmt.Println(err)
 		os.Exit(1)
 	}
+	
+	fileReader(path)
 	fmt.Println(part,path,pool)
 }
