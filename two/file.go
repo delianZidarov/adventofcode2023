@@ -6,22 +6,32 @@ import (
 	"os"
 )
 
-const buffSize = 200
-
-func fileReader (p string){
-	r, err := os.Open(p)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	buff := make([]byte, buffSize)
-	for i:=0;i<5;i++ {
-		n, err := r.Read(buff)
-		if err != nil {
-			break
-		}
-		lnEnd := bytes.IndexByte(buff[:n], byte('\n'))
-		fmt.Println("here", string(buff[:lnEnd]), bytes.IndexByte(buff[:n],byte('\n')), buff[lnEnd+2])
-		r.Seek(int64(lnEnd - buffSize + 1), 1)
-	}
+type fileReader struct {
+	P string
+	o int64
+	f *os.File
 }
+
+const bufSize = 200
+
+func (fr *fileReader) Open(){
+ r, err := os.Open(fr.P) 
+ if err != nil {
+	fmt.Println(err)
+	os.Exit(1)
+	}
+	fr.f = r
+}
+
+func (fr *fileReader) NextLn() (string, error) {
+	buf := make([]byte, bufSize)
+	fr.f.Seek(fr.o, 0)
+	n, err := fr.f.Read(buf)
+	if err != nil {
+		return string(buf[:n]), err
+	}
+	lnEnd := bytes.IndexByte(buf, byte('\n'))
+	fr.o += int64(lnEnd)+1
+	return string(buf[:lnEnd]), nil
+}
+

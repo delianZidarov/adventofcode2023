@@ -11,7 +11,14 @@ func main (){
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	
-	fileReader(path)
+	f:= fileReader{P : path}
+	f.Open()
+	for {
+		ln, err := f.NextLn()
+		if err!=nil{
+		break
+		}
+		fmt.Println(ln)
+	}
 	fmt.Println(part,path,pool)
 }
