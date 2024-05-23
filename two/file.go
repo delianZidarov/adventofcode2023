@@ -56,5 +56,6 @@ func Score(ln string, pool *[3]int64) (int, error) {
 	}
 	//	fmt.Println(games, points, *pool)
 	fmt.Println(points)
+	//just checking github
 	return 0, nil
 }
