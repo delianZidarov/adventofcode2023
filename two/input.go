@@ -22,8 +22,8 @@ func (e *InputError) Error() string {
 }
 
 func parseInput(arg []string) (part int64, path string, pool [3]int64, e error) {
-	if len(arg) != 10{
-			e = &ArgLenError{}
+	if len(arg) != 10 {
+		e = &ArgLenError{}
 		return
 	}
 	for i := 0; i < 9; i++ {

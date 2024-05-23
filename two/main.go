@@ -1,24 +1,24 @@
-package main 
+package main
 
 import (
-	"os"
 	"fmt"
+	"os"
 )
 
-func main (){
+func main() {
 	part, path, pool, err := parseInput(os.Args[1:])
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	f:= fileReader{P : path}
+	f := fileReader{P: path}
 	f.Open()
 	for {
 		ln, err := f.NextLn()
-		if err!=nil{
-		break
+		if err != nil {
+			break
 		}
-		fmt.Println(ln)
+		Score(ln, &pool)
 	}
-	fmt.Println(part,path,pool)
+	fmt.Println(part, path, pool)
 }

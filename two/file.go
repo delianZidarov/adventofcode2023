@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
+	// "strings"
 )
 
 type fileReader struct {
@@ -14,11 +17,11 @@ type fileReader struct {
 
 const bufSize = 200
 
-func (fr *fileReader) Open(){
- r, err := os.Open(fr.P) 
- if err != nil {
-	fmt.Println(err)
-	os.Exit(1)
+func (fr *fileReader) Open() {
+	r, err := os.Open(fr.P)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	fr.f = r
 }
@@ -31,7 +34,27 @@ func (fr *fileReader) NextLn() (string, error) {
 		return string(buf[:n]), err
 	}
 	lnEnd := bytes.IndexByte(buf, byte('\n'))
-	fr.o += int64(lnEnd)+1
+	fr.o += int64(lnEnd) + 1
 	return string(buf[:lnEnd]), nil
 }
 
+func Score(ln string, pool *[3]int64) (int, error) {
+	var points int64
+	buf := make([]byte, 0, len(ln))
+	for i, ch := range ln {
+		if ch == ' ' && points == 0 {
+			for ln[i] != ':' {
+				buf = append(buf, ln[i])
+				i++
+			}
+			p, err := strconv.ParseInt(strings.TrimSpace(string(buf)), 10, 64)
+			if err != nil {
+				fmt.Println(err)
+			}
+			points = p
+		}
+	}
+	//	fmt.Println(games, points, *pool)
+	fmt.Println(points)
+	return 0, nil
+}
