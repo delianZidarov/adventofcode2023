@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
-	// "strings"
 )
 
 type fileReader struct {
@@ -41,21 +39,48 @@ func (fr *fileReader) NextLn() (string, error) {
 func Score(ln string, pool *[3]int64) (int, error) {
 	var points int64
 	buf := make([]byte, 0, len(ln))
-	for i, ch := range ln {
-		if ch == ' ' && points == 0 {
+	dataStart := 0
+	pointMultiplier := 1
+	for i := 0; i < len(ln); i++ {
+		if ln[i] == ' ' && points == 0 {
+			i++
 			for ln[i] != ':' {
 				buf = append(buf, ln[i])
 				i++
 			}
-			p, err := strconv.ParseInt(strings.TrimSpace(string(buf)), 10, 64)
+			p, err := strconv.ParseInt(string(buf[dataStart:]), 10, 64)
 			if err != nil {
-				fmt.Println(err)
+				return 0, err
 			}
 			points = p
+		} else if ln[i] == ' ' {
+			i++
+			dataStart = len(buf)
+			for ln[i] != ' ' {
+				buf = append(buf, ln[i])
+				i++
+			}
+			count, err := strconv.ParseInt(string(buf[dataStart:]), 10, 64)
+			if err != nil {
+				return 0, err
+			}
+			switch ln[i+1] {
+			case 'r':
+				if pool[0] < count {
+					pointMultiplier = 0
+				}
+			case 'g':
+				if pool[1] < count {
+					pointMultiplier = 0
+				}
+			case 'b':
+				if pool[2] < count {
+					pointMultiplier = 0
+				}
+
+			}
+
 		}
 	}
-	//	fmt.Println(games, points, *pool)
-	fmt.Println(points)
-	//just checking github
-	return 0, nil
+	return int(points) * pointMultiplier, nil
 }

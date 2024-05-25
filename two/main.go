@@ -7,6 +7,7 @@ import (
 
 func main() {
 	part, path, pool, err := parseInput(os.Args[1:])
+	sum := 0
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -18,7 +19,13 @@ func main() {
 		if err != nil {
 			break
 		}
-		Score(ln, &pool)
+		n, err := Score(ln, &pool)
+		if err != nil {
+		  fmt.Println(err)
+			os.Exit(1)
+		}
+		sum += n
 	}
-	fmt.Println(part, path, pool)
+	fmt.Println(sum)
+  fmt.Println("part ", part)
 }
