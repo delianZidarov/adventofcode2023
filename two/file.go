@@ -84,3 +84,48 @@ func Score(ln string, pool *[3]int64) (int, error) {
 	}
 	return int(points) * pointMultiplier, nil
 }
+
+func Power(ln string) (int, error) {
+	var (
+		minR int64 = 0
+		minG int64 = 0
+		minB int64 = 0
+	)
+	buf := make([]byte, len(ln))
+	start := false
+	dataStart := 0
+	for i := 0; i < len(ln); i++ {
+		if ln[i] == ':' {
+			start = true
+		}
+		if ln[i] == ' ' && start {
+			i++
+			dataStart = len(buf)
+			for ln[i] != ' ' {
+				buf = append(buf, ln[i])
+				i++
+			}
+			v, err := strconv.ParseInt(string(buf[dataStart:]), 10, 64)
+			if err != nil {
+				return 0, err
+			}
+			switch ln[i+1] {
+			case 'r':
+				if v > minR {
+					minR = v
+				}
+			case 'g':
+				if v > minG {
+					minG = v
+				}
+			case 'b':
+				if v > minB {
+					minB = v
+				}
+
+			}
+		}
+
+	}
+	return int(minR * minG * minB), nil
+}

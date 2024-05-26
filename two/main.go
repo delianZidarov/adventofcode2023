@@ -19,13 +19,22 @@ func main() {
 		if err != nil {
 			break
 		}
-		n, err := Score(ln, &pool)
-		if err != nil {
-		  fmt.Println(err)
-			os.Exit(1)
+		if part == 1 {
+			n, err := Score(ln, &pool)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			sum += n
 		}
-		sum += n
+		if part == 2 {
+			n, err := Power(ln)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			sum += n
+		}
 	}
 	fmt.Println(sum)
-  fmt.Println("part ", part)
 }

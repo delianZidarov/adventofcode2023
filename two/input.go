@@ -13,20 +13,12 @@ type (
 	}
 )
 
-func (e *ArgLenError) Error() string {
-	return fmt.Sprintf("Not enough arguments were provided. -p (part) -f (file) -r (red) -g (green) -b (blue) required")
-}
-
 func (e *InputError) Error() string {
 	return fmt.Sprintf("There is a problem with argument %v and value %v", e.argument, e.value)
 }
 
 func parseInput(arg []string) (part int64, path string, pool [3]int64, e error) {
-	if len(arg) != 10 {
-		e = &ArgLenError{}
-		return
-	}
-	for i := 0; i < 9; i++ {
+	for i := 0; i < len(arg)-1; i++ {
 		switch arg[i] {
 		case "-p":
 			p, err := strconv.ParseInt(arg[i+1], 10, 64)
