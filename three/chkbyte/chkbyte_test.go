@@ -4,6 +4,7 @@ import (
 	"testing"
 )
 
+
 func TestIsDot(t *testing.T) {
 	for i := 0; i < 128; i++ {
 		if i == 46 {
@@ -28,10 +29,49 @@ func TestIsDot(t *testing.T) {
 }
 
 func TestIsNumber(t *testing.T) {
-	numbers := []byte{'0','1','2','3','4','5','6','7','8','9'}
-  for _,n := range numbers{
-	 if IsNumber(n) != true {
-     t.Fatalf("Expected %v to return true",n)
+	numbers := []byte{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
+	for _, n := range numbers {
+		if IsNumber(n) != true {
+			t.Fatalf("Expected %v to return true", n)
+		}
+	}
+	for i := 0; i < 128; i++ {
+		if i < 48 || i > 57 {
+			if IsNumber(byte(i)) == true {
+				t.Fatalf("Expected %v to return false", i)
+			}
+		}
+	}
+}
+
+type hasSymbolNeighborTest struct {
+	row      int
+	column   int
+	expected bool
+}
+
+var hasSymbolNeighborTests = []hasSymbolNeighborTest{
+	{0, 1, false},
+	{0, 3, false},
+	{0, 4, true},
+	{2, 2, true},
+	{2, 5, false},
+	{4, 0, true},
+}
+func TestHasSymbolNeighbor(t *testing.T) {
+	testMatrix := [][]byte{
+		// 0   1   2   3   4   5
+		{'.', '4', '.', '2', '3', '-'}, // 0
+		{'.', '.', '.', '.', '.', '.'}, // 1
+		{'.', '+', '5', '.', '.', '1'}, // 2
+		{'.', '.', '.', '.', '.', '.'}, // 3
+		{'2', '.', '.', '.', '.', '.'}, // 4
+		{'.', '/', '.', '.', '.', '.'}, // 5
+	}
+	for _, test := range hasSymbolNeighborTests {
+		got := HasSymbolNeighbor(test.row, test.column, &testMatrix)
+		if got != test.expected {
+			t.Fatalf("Expected hasNeighbor to return % v got %v", test.expected, got)
 		}
 	}
 }
