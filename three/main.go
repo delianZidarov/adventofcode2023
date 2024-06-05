@@ -21,8 +21,7 @@ func main() {
 	}
 
 	sum := 0
-
-	for row := 0; row < len(m); row++ {
+	for row := 0; row < len(m)-1; row++ {
 		// The starting index of consecutive numbers
 		nStart := 0
 		// Holds whether any of the numbers had a symbol
@@ -52,7 +51,9 @@ func main() {
 				newN = true
 				hs = false
 				// Handle the end of a line
-			} else if column == len(m[row])-1 {
+			} 
+			//This should run at the end of every line
+			if column == len(m[row])-1 {
 				if hs {
 					n, err := strconv.ParseInt(string(m[row][nStart:]), 10, 64)
 					if err != nil {
@@ -67,5 +68,5 @@ func main() {
 		}
 	}
 
-	fmt.Println(sum)
+	fmt.Println("THE SUM IS: ",sum)
 }
