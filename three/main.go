@@ -67,6 +67,42 @@ func main() {
 			}
 		}
 	}
+  
 
+type numberTest struct {
+   row int
+	 column int
+	 expect int
+}
+
+var numberTests = []numberTest{
+	{0,1,4},
+  {0,5,231},
+	{5,4,246},
+  {4,0, 2},
+}
+	testMatrix := [][]byte{
+		//0    1    2    3    4    5
+		{'.', '4', '.', '2', '3', '1'}, // 0
+		{'.', '.', '.', '.', '.', '.'}, // 1
+		{'.', '+', '5', '.', '.', '.'}, // 2
+		{'.', '.', '.', '.', '.', '.'}, // 3
+		{'2', '.', '.', '.', '.', '.'}, // 4
+		{'.', '/', '.', '2', '4', '6'}, // 5
+	}
+
+	fmt.Println("*********************************************")
+	for _,test := range numberTests {
+		want := test.expect
+		got, err := chkbyte.Number(test.row, test.column, &testMatrix)
+		fmt.Println("Am I in an infinite", got)
+		if err != nil {
+		 fmt.Println("Unexpected error: ", err)
+		}
+		if want != got {
+     fmt.Println("Expected to get number ", want," got ", got)
+		}
+	}
+	fmt.Println("*********************************************")
 	fmt.Println("THE SUM IS: ",sum)
 }

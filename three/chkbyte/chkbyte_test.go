@@ -4,7 +4,6 @@ import (
 	"testing"
 )
 
-
 func TestIsDot(t *testing.T) {
 	for i := 0; i < 128; i++ {
 		if i == 46 {
@@ -58,6 +57,7 @@ var hasSymbolNeighborTests = []hasSymbolNeighborTest{
 	{2, 5, false},
 	{4, 0, true},
 }
+
 func TestHasSymbolNeighbor(t *testing.T) {
 	testMatrix := [][]byte{
 		// 0   1   2   3   4   5
@@ -72,6 +72,40 @@ func TestHasSymbolNeighbor(t *testing.T) {
 		got := HasSymbolNeighbor(test.row, test.column, &testMatrix)
 		if got != test.expected {
 			t.Fatalf("Expected hasNeighbor to return % v got %v", test.expected, got)
+		}
+	}
+}
+
+type numberTest struct {
+   row int
+	 column int
+	 expect int
+}
+
+var numberTests = []numberTest{
+	{0,1,4},
+  {0,5,231},
+	{5,4,246},
+  {4,0, 2},
+}
+func TestNumber(t *testing.T) {
+	testMatrix := [][]byte{
+		//0    1    2    3    4    5
+		{'.', '4', '.', '2', '3', '1'}, // 0
+		{'.', '.', '.', '.', '.', '.'}, // 1
+		{'.', '+', '5', '.', '.', '.'}, // 2
+		{'.', '.', '.', '.', '.', '.'}, // 3
+		{'2', '.', '.', '.', '.', '.'}, // 4
+		{'.', '/', '.', '2', '4', '6'}, // 5
+	}
+	for _,test := range numberTests {
+		want := test.expect
+		got, err := Number(test.row, test.column, &testMatrix)
+		if err != nil {
+		 t.Fatalf("Unexpected error: %v", err)
+		}
+		if want != got {
+     t.Fatalf("Expected to get number %v got %v", want, got)
 		}
 	}
 }
