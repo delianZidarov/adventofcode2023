@@ -98,30 +98,21 @@ func CheckNumberNeighbor(
 func Number(row int, column int, m *[][]byte) (int, error) {
 	start := column
 	end := column
-	fmt.Println("Start and end ", start, ", ", end)
-	for IsNumber((*m)[row][start]) {
-		if start <= 0 {
-			start = 0
+	for start >= 0 {
+		if !IsNumber((*m)[row][start]) {
 			break
 		}
 		start -= 1
 	}
 
-	for IsNumber((*m)[row][end]) {
-		if end >= len((*m)[row]) {
-			end = len((*m)[row])
-			break
-		}
+	for end < len((*m)[row]) && IsNumber((*m)[row][end]) {
 		end += 1
 	}
-
-	fmt.Println("What number is this: ", end)
-	v, err := strconv.ParseInt(string((*m)[row][ start: end]), 10, 64)
+	v, err := strconv.ParseInt(string((*m)[row][start+1:end]), 10, 64)
 	if err != nil {
 		fmt.Println(err)
 		return 0, err
 	}
-	fmt.Println(v)
 	return int(v), nil
 }
 

@@ -43,6 +43,16 @@ func TestIsNumber(t *testing.T) {
 	}
 }
 
+func TestIsAsterix(t *testing.T) {
+	for i := 0; i < 128; i++ {
+		if i == 42 && !IsAsterix(byte(i)) {
+			t.Fatalf("Expected %v to return true", string(byte(i)))
+		} else if i != 42 && IsAsterix(byte(i)) {
+			t.Fatalf("%v Expected %v to return false", i, string(byte(i)))
+		}
+	}
+}
+
 type hasSymbolNeighborTest struct {
 	row      int
 	column   int
@@ -77,20 +87,21 @@ func TestHasSymbolNeighbor(t *testing.T) {
 }
 
 type numberTest struct {
-   row int
-	 column int
-	 expect int
+	row    int
+	column int
+	expect int
 }
 
 var numberTests = []numberTest{
-	{0,1,4},
-  {0,5,231},
-	{5,4,246},
-  {4,0, 2},
+	{0, 1, 4},
+	{0, 5, 231},
+	{5, 4, 246},
+	{4, 0, 2},
 }
+
 func TestNumber(t *testing.T) {
 	testMatrix := [][]byte{
-		//0    1    2    3    4    5
+		// 0    1    2    3    4    5
 		{'.', '4', '.', '2', '3', '1'}, // 0
 		{'.', '.', '.', '.', '.', '.'}, // 1
 		{'.', '+', '5', '.', '.', '.'}, // 2
@@ -98,14 +109,39 @@ func TestNumber(t *testing.T) {
 		{'2', '.', '.', '.', '.', '.'}, // 4
 		{'.', '/', '.', '2', '4', '6'}, // 5
 	}
-	for _,test := range numberTests {
+	for _, test := range numberTests {
 		want := test.expect
 		got, err := Number(test.row, test.column, &testMatrix)
 		if err != nil {
-		 t.Fatalf("Unexpected error: %v", err)
+			t.Fatalf("Unexpected error: %v", err)
 		}
 		if want != got {
-     t.Fatalf("Expected to get number %v got %v", want, got)
+			t.Fatalf("Expected to get number %v got %v", want, got)
 		}
+	}
+}
+
+type numberNeighborTest struct {
+	row    int
+	column int
+	expext [][]int
+}
+
+var numberNeighborTests = []numberNeighborTest {
+	{},
+  {},
+  {},
+  {},
+}
+
+func TestCheckNumberNeighbor (t *testing.T) {
+	testMatrix := [][]byte{
+		// 0    1    2    3    4    5
+		{'.', '4', '.', '2', '3', '1'}, // 0
+		{'.', '.', '.', '.', '.', '.'}, // 1
+		{'.', '+', '5', '.', '.', '.'}, // 2
+		{'.', '.', '.', '.', '.', '.'}, // 3
+		{'2', '.', '.', '.', '.', '.'}, // 4
+		{'.', '/', '.', '2', '4', '6'}, // 5
 	}
 }
