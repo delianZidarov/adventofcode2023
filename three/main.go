@@ -21,6 +21,8 @@ func main() {
 	}
 
 	sum := 0
+  p, ok := arg["p"]
+	if p=="1" || !ok{
 	for row := 0; row < len(m)-1; row++ {
 		// The starting index of consecutive numbers
 		nStart := 0
@@ -67,6 +69,9 @@ func main() {
 			}
 		}
 	}
-  
+	}
+	if ok && p=="2"{
+   fmt.Println("Part 2")
+	}
 	fmt.Println("THE SUM IS: ",sum)
 }

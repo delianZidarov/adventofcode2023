@@ -77,17 +77,19 @@ func CheckNumberNeighbor(
 	row int, column int, m *[][]byte,
 ) (locations [][]int) {
 	uRow := max(0, row-1)
-	lRow := min(len(*m), row+1)
+	lRow := min(len(*m)-1, row+1)
 	lftColumn := max(0, column-1)
-	rghtColumn := min(len((*m)[row]), column+1)
-
+	rghtColumn := min(len((*m)[row])-1, column+1)
+   
 	falseEn := true
-
 	for r := uRow; r <= lRow; r++ {
 		for c := lftColumn; c <= rghtColumn; c++ {
 			if IsNumber((*m)[r][c]) && falseEn {
 				locations = append(locations, []int{r, c})
 				falseEn = false
+			}
+			if !IsNumber((*m)[r][c]) {
+				falseEn = true
 			}
 		}
 		falseEn = true

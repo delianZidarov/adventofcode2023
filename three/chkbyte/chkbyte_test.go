@@ -2,6 +2,7 @@ package chkbyte
 
 import (
 	"testing"
+	"fmt"
 )
 
 func TestIsDot(t *testing.T) {
@@ -128,20 +129,27 @@ type numberNeighborTest struct {
 }
 
 var numberNeighborTests = []numberNeighborTest {
-	{},
-  {},
-  {},
-  {},
+	{0,4,[][]int{{0,3},{0,5}}},
+  {2,1,[][]int{{1,1},{2,0},{2,2}}},
+  {5,0,[][]int{{4,0}}},
+	{5,5,[][]int{{4,5},{5,4}}},
 }
 
 func TestCheckNumberNeighbor (t *testing.T) {
 	testMatrix := [][]byte{
-		// 0    1    2    3    4    5
-		{'.', '4', '.', '2', '3', '1'}, // 0
-		{'.', '.', '.', '.', '.', '.'}, // 1
-		{'.', '+', '5', '.', '.', '.'}, // 2
+		//0    1    2    3    4    5
+		{'.', '4', '.', '2', '*', '1'}, // 0
+		{'.', '2', '.', '.', '.', '.'}, // 1
+		{'1', '*', '5', '.', '.', '.'}, // 2
 		{'.', '.', '.', '.', '.', '.'}, // 3
-		{'2', '.', '.', '.', '.', '.'}, // 4
-		{'.', '/', '.', '2', '4', '6'}, // 5
+		{'2', '.', '.', '.', '.', '2'}, // 4
+		{'*', '/', '.', '2', '4', '*'}, // 5
+	}
+	for _, test := range numberNeighborTests {
+		got := CheckNumberNeighbor(test.row,test.column, &testMatrix)
+		want := test.expext
+		if fmt.Sprint(got) != fmt.Sprint(want){
+			t.Fatalf("GOT: %v WANT: %v",got, want)
+		} 
 	}
 }
