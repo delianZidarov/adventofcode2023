@@ -71,7 +71,25 @@ func main() {
 	}
 	}
 	if ok && p=="2"{
-   fmt.Println("Part 2")
+		for row := 0; row < len(m); row ++ {
+      for column := 0; column < len(m[row]); column ++{
+	     if chkbyte.IsAsterix(m[row][column]){
+         n := chkbyte.CheckNumberNeighbor(row, column, &m)
+					if len(n) == 2 {
+						s := 1
+						for _, pair := range n{
+							n, err := chkbyte.Number(pair[0], pair[1], &m)
+							if err != nil {
+               fmt.Println(err)
+								os.Exit(1)
+							}
+							s = s * n
+						}
+						sum += s
+					}
+				}
+		}
+		}
 	}
 	fmt.Println("THE SUM IS: ",sum)
 }
