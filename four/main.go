@@ -27,4 +27,6 @@ func main () {
 	if p==1{
   partOne(scanner)
 	}
+
+	partTwo(scanner)
 }

@@ -11,9 +11,21 @@ func partOne(s *bufio.Scanner) {
 	for s.Scan() {
 		card := s.Text()
 		n := value(card)
-sum += n
+		sum += score(n)
 	}
 	fmt.Println("TOTAL: ", sum)
+}
+
+func score(n int) (v int) {
+	switch n {
+	case 0:
+		v = 0
+	case 1:
+		v = 1
+	default:
+		v = 2 << (n - 2)
+	}
+	return
 }
 
 func value(s string) (v int) {
@@ -46,14 +58,6 @@ func value(s string) (v int) {
 			}
 		}
 	}
-	switch n {
-	case 0:
-		v = 0
-	case 1:
-		v = 1
-	default:
-		v = 2 << (n - 2)
-
-	}
+	v = n
 	return
 }
