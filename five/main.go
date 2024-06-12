@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"strconv"
 )
 
 func main() {
@@ -24,7 +25,9 @@ func main() {
 		os.Exit(1)
 	}
 	f.Read(buf)
-	blocks(buf)
+	b := blocks(buf)
+
+	fmt.Println(parseSeeds(b[0]))
 
 	switch p {
 	case 1:
@@ -37,10 +40,79 @@ func main() {
 func blocks(buf []byte) (chunks [][]byte) {
 	mid := bytes.Split(buf, []byte("\n\n"))
 	for i := 0; i < len(mid)-1; i++ {
-		if len(mid[i]) > 0{
+		if len(mid[i]) > 0 {
 			chunks = append(chunks, mid[i])
-		 fmt.Println(string(mid[i]))
 		}
 	}
 	return chunks
 }
+
+func parseSeeds(block []byte) (seeds []int, err error) {
+	in := make([]int, 0)
+	for i, char := range block {
+		if char == ' ' {
+			in = append(in, i)
+		}
+	}
+
+	for i := 0; i < len(in); i++ {
+		if i == len(in)-1 {
+			n, err := strconv.ParseInt(string(block[in[i]+1:]), 10, 64)
+			if err != nil {
+				return seeds, err
+			}
+			seeds = append(seeds, int(n))
+		} else {
+			n, err := strconv.ParseInt(string(block[in[i]+1:in[i+1]]), 10, 64)
+			if err != nil {
+				return seeds, err
+			}
+			seeds = append(seeds, int(n))
+		}
+	}
+	return seeds, nil
+}
+
+type Node struct {
+  lower,upper,mod,height int
+	left  *Node
+	right *Node
+}
+
+type Tree struct {
+ head *Node 
+}
+
+func (t Tree) insert( n Node){
+ if t.head == nil {
+   t.head =&n
+	}
+	current := t.head
+	notWritten := true
+	for notWritten {
+  if n.upper > current.upper {
+    if current.right == nil {
+		current.right = &n
+		notWritten = false
+		} else {
+			current = current.left
+		}
+
+	} else if n.upper < current.upper{
+		if current.left == nil {
+    current.left = &n
+		notWritten = false
+		} else {
+      current = current.right
+		}
+	}
+	}
+    
+}
+
+func (t Tree) value(l int) (f int) {
+
+	return f
+}
+
+func (t Tree) rebalance (){}
