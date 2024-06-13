@@ -26,8 +26,19 @@ func main() {
 	}
 	f.Read(buf)
 	b := blocks(buf)
-
+	fmt.Println("******************")
 	fmt.Println(parseSeeds(b[0]))
+	fmt.Println("******************")
+	test := Tree{}
+	in := []int{2, 1, 4, 3, 5, 6}
+
+	for _, v := range in {
+		test.insert(0, v, 0)
+	}
+
+	fmt.Println(test.root)
+	fmt.Println(test.root.left, test.root.right)
+	fmt.Println(test.root.left.left, test.root.left.right, test.root.right.left, test.root.right.right)
 
 	switch p {
 	case 1:
@@ -74,45 +85,64 @@ func parseSeeds(block []byte) (seeds []int, err error) {
 }
 
 type Node struct {
-  lower,upper,mod,height int
-	left  *Node
-	right *Node
+	lower int
+	//, upper, dest,
+	height int
+	left   *Node
+	right  *Node
 }
 
 type Tree struct {
- head *Node 
+	root *Node
 }
 
-func (t Tree) insert( n Node){
- if t.head == nil {
-   t.head =&n
+func newNode(dest, source, r int) (n *Node) {
+	n = &Node{
+		lower: source,
+		// upper: source + r -1,
+		//	dest:   dest,
+		height: 0,
+		left:   nil,
+		right:  nil,
 	}
-	current := t.head
-	notWritten := true
-	for notWritten {
-  if n.upper > current.upper {
-    if current.right == nil {
-		current.right = &n
-		notWritten = false
-		} else {
-			current = current.left
+	return
+}
+
+func (t *Tree) insert(dest, source, r int) {
+	// visit := make([]*Node, 0)
+	c := t.root
+	look := true
+	// Empty case
+	if t.root == nil {
+		t.root = newNode(dest, source, r)
+		return
+	}
+
+	// Iteratively look for an empty space to
+	// insert a new node
+	for look {
+		// Insert
+		if source > c.lower && c.right == nil {
+			c.right = newNode(dest, source, r)
+			look = false
+		}
+		if source < c.lower && c.left == nil {
+			c.left = newNode(dest, source, r)
+			look = false
+		}
+		// Move to the next node
+		if source > c.lower && c.right != nil {
+			c = c.right
+		}
+		if source < c.lower && c.left != nil {
+			c = c.left
 		}
 
-	} else if n.upper < current.upper{
-		if current.left == nil {
-    current.left = &n
-		notWritten = false
-		} else {
-      current = current.right
-		}
 	}
-	}
-    
 }
 
 func (t Tree) value(l int) (f int) {
-
 	return f
 }
 
-func (t Tree) rebalance (){}
+func (t Tree) rebalance() {}
