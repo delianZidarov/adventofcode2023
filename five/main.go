@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -110,73 +111,77 @@ func newNode(dest, source, r int) (n *Node) {
 
 func (t *Tree) insert(dest, source, r int) {
 	visit := make([]*Node, 0)
-	c := t.root
-	look := true
-
-	// Empty case
-	if t.root == nil {
+	empty, s, _ := emptyNode(source, t.root, &visit)
+	fmt.Println("inserting: ", source, empty, s)
+	switch {
+	case empty == nil:
 		t.root = newNode(dest, source, r)
-		return
+	case s == 0:
+		empty.left = newNode(dest, source, r)
+	case s == 1:
+		empty.right = newNode(dest, source, r)
 	}
 
-	// Iteratively look for an empty space to
-	// insert a new node
-	for look {
+
+	// Go back up the path to adjust height and rebalance
+	for i := len(visit) - 1; i >= 0; i-- {
+		fmt.Println("GOING back: ")
+		// heights
+		updateHeight(visit[i])
+		// balance
+		// Left side heavy
+		if getHeight(visit[i].left)-getHeight(visit[i].right) > 1 {
+		}
+		// Right side heavy
+		if getHeight(visit[i].left)-getHeight(visit[i].right) < -1 {
+		}
+		//}
+	}
+}
+
+func updateHeight(n *Node) {
+	if n.left == nil {
+		n.height = n.right.height + 1
+	} else if n.right == nil {
+		n.height = n.left.height + 1
+	} else {
+		n.height = max(n.left.height, n.right.height) + 1
+	}
+}
+
+func emptyNode(source int, c *Node, visit *[]*Node) (*Node, int, error) {
+	if c == nil {
+		return c,0, nil
+	}
+	for true {
 		// Insert
 		if source >= c.lower && c.right == nil {
-			c.right = newNode(dest, source, r)
-			look = false
+			*visit = append(*visit, c)
+			return c, 1, nil
 		}
 		if source < c.lower && c.left == nil {
-			c.left = newNode(dest, source, r)
-			look = false
+			*visit = append(*visit, c)
+			return c, 0, nil
 		}
 		// Move to the next node
 		if source >= c.lower && c.right != nil {
-			visit = append(visit, c)
+			*visit = append(*visit, c)
 			c = c.right
 		}
 		if source < c.lower && c.left != nil {
-			visit = append(visit, c)
+			*visit = append(*visit, c)
 			c = c.left
 		}
-
-		// Go back up the path to adjust height and rebalance
-		for i := len(visit) - 1; i >= 0; i-- {
-			fmt.Println("GOING back: ")
-			// heights
-			updateHeight(visit[i])
-			// balance
-			//Left side heavy
-      if getHeight(visit[i].left) - getHeight(visit[i].right) > 1 {
-
-
-			}
-			//Right side heavy
-      if getHeight(visit[i].left) - getHeight(visit[i].right) < -1 {
-
-      }
-		}
 	}
+	return nil, 0,errors.New("No location found")
 }
 
-func updateHeight (n *Node) {
-			if n.left == nil {
-				n.height = n.right.height + 1
-			} else if n.right == nil {
-				n.height = n.left.height + 1
-			} else {
-				n.height = max(n.left.height, n.right.height) + 1
-			}
-
-}
-
-func getHeight (n *Node) (h int){
- if n != nil {
-   h = n.height
+func getHeight(n *Node) (h int) {
+	if n != nil {
+		h = n.height
 	}
 	return
-} 
+}
 
 func max(a, b int) (m int) {
 	if a >= b {
