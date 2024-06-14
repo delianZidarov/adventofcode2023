@@ -30,7 +30,7 @@ func main() {
 	fmt.Println(parseSeeds(b[0]))
 	fmt.Println("******************")
 	test := Tree{}
-	in := []int{2, 1, 4, 3, 5, 6}
+	in := []int{2, 1, 5, 4, 6, 3}
 
 	for _, v := range in {
 		test.insert(0, v, 0)
@@ -109,9 +109,10 @@ func newNode(dest, source, r int) (n *Node) {
 }
 
 func (t *Tree) insert(dest, source, r int) {
-	// visit := make([]*Node, 0)
+	visit := make([]*Node, 0)
 	c := t.root
 	look := true
+
 	// Empty case
 	if t.root == nil {
 		t.root = newNode(dest, source, r)
@@ -122,7 +123,7 @@ func (t *Tree) insert(dest, source, r int) {
 	// insert a new node
 	for look {
 		// Insert
-		if source > c.lower && c.right == nil {
+		if source >= c.lower && c.right == nil {
 			c.right = newNode(dest, source, r)
 			look = false
 		}
@@ -131,14 +132,59 @@ func (t *Tree) insert(dest, source, r int) {
 			look = false
 		}
 		// Move to the next node
-		if source > c.lower && c.right != nil {
+		if source >= c.lower && c.right != nil {
+			visit = append(visit, c)
 			c = c.right
 		}
 		if source < c.lower && c.left != nil {
+			visit = append(visit, c)
 			c = c.left
 		}
 
+		// Go back up the path to adjust height and rebalance
+		for i := len(visit) - 1; i >= 0; i-- {
+			fmt.Println("GOING back: ")
+			// heights
+			updateHeight(visit[i])
+			// balance
+			//Left side heavy
+      if getHeight(visit[i].left) - getHeight(visit[i].right) > 1 {
+
+
+			}
+			//Right side heavy
+      if getHeight(visit[i].left) - getHeight(visit[i].right) < -1 {
+
+      }
+		}
 	}
+}
+
+func updateHeight (n *Node) {
+			if n.left == nil {
+				n.height = n.right.height + 1
+			} else if n.right == nil {
+				n.height = n.left.height + 1
+			} else {
+				n.height = max(n.left.height, n.right.height) + 1
+			}
+
+}
+
+func getHeight (n *Node) (h int){
+ if n != nil {
+   h = n.height
+	}
+	return
+} 
+
+func max(a, b int) (m int) {
+	if a >= b {
+		m = a
+	} else {
+		m = b
+	}
+	return
 }
 
 func (t Tree) value(l int) (f int) {
