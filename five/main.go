@@ -31,7 +31,7 @@ func main() {
 	fmt.Println(parseSeeds(b[0]))
 	fmt.Println("******************")
 	test := Tree{}
-	in := []int{2, 1, 5, 4, 6, 3}
+	in := []int{3,2,4,1,0}
 
 	for _, v := range in {
 		test.insert(0, v, 0)
@@ -102,7 +102,7 @@ func newNode(dest, source, r int) (n *Node) {
 		lower: source,
 		// upper: source + r -1,
 		//	dest:   dest,
-		height: 0,
+		height: 1,
 		left:   nil,
 		right:  nil,
 	}
@@ -112,7 +112,6 @@ func newNode(dest, source, r int) (n *Node) {
 func (t *Tree) insert(dest, source, r int) {
 	visit := make([]*Node, 0)
 	empty, s, _ := emptyNode(source, t.root, &visit)
-	fmt.Println("inserting: ", source, empty, s)
 	switch {
 	case empty == nil:
 		t.root = newNode(dest, source, r)
@@ -122,15 +121,28 @@ func (t *Tree) insert(dest, source, r int) {
 		empty.right = newNode(dest, source, r)
 	}
 
-
 	// Go back up the path to adjust height and rebalance
 	for i := len(visit) - 1; i >= 0; i-- {
-		fmt.Println("GOING back: ")
 		// heights
 		updateHeight(visit[i])
 		// balance
 		// Left side heavy
 		if getHeight(visit[i].left)-getHeight(visit[i].right) > 1 {
+			// rotate right
+      if visit[i] == t.root {
+         temp := *visit[i]
+				 t.root = visit[i].left
+				 t.root.right = &temp
+				 updateHeight(t.root.right)
+				updateHeight(t.root)
+			} else {
+         temp := visit[i]
+				 visit[i-1].left = visit[i].left
+				 visit[i].right = temp
+				fmt.Println("Rotation: ", visit[i].right) 
+         updateHeight(visit[i].right)
+				 updateHeight(visit[i])
+			}
 		}
 		// Right side heavy
 		if getHeight(visit[i].left)-getHeight(visit[i].right) < -1 {
@@ -140,7 +152,9 @@ func (t *Tree) insert(dest, source, r int) {
 }
 
 func updateHeight(n *Node) {
-	if n.left == nil {
+	if n.left == nil && n.right == nil{
+	 n.height = 1
+	}else if n.left == nil {
 		n.height = n.right.height + 1
 	} else if n.right == nil {
 		n.height = n.left.height + 1
@@ -151,7 +165,7 @@ func updateHeight(n *Node) {
 
 func emptyNode(source int, c *Node, visit *[]*Node) (*Node, int, error) {
 	if c == nil {
-		return c,0, nil
+		return c, 0, nil
 	}
 	for true {
 		// Insert
@@ -173,7 +187,7 @@ func emptyNode(source int, c *Node, visit *[]*Node) (*Node, int, error) {
 			c = c.left
 		}
 	}
-	return nil, 0,errors.New("No location found")
+	return nil, 0, errors.New("No location found")
 }
 
 func getHeight(n *Node) (h int) {
