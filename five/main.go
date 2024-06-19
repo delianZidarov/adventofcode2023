@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -30,17 +29,7 @@ func main() {
 	fmt.Println("******************")
 	fmt.Println(parseSeeds(b[0]))
 	fmt.Println("******************")
-	test := Tree{}
-	in := []int{3,2,4,1,0}
-
-	for _, v := range in {
-		test.insert(0, v, 0)
-	}
-
-	fmt.Println(test.root)
-	fmt.Println(test.root.left, test.root.right)
-	fmt.Println(test.root.left.left, test.root.left.right, test.root.right.left, test.root.right.right)
-
+  fmt.Println(string(b[1]))
 	switch p {
 	case 1:
 		fmt.Println("Part 1")
@@ -84,130 +73,3 @@ func parseSeeds(block []byte) (seeds []int, err error) {
 	}
 	return seeds, nil
 }
-
-type Node struct {
-	lower int
-	//, upper, dest,
-	height int
-	left   *Node
-	right  *Node
-}
-
-type Tree struct {
-	root *Node
-}
-
-func newNode(dest, source, r int) (n *Node) {
-	n = &Node{
-		lower: source,
-		// upper: source + r -1,
-		//	dest:   dest,
-		height: 1,
-		left:   nil,
-		right:  nil,
-	}
-	return
-}
-
-func (t *Tree) insert(dest, source, r int) {
-	visit := make([]*Node, 0)
-	empty, s, _ := emptyNode(source, t.root, &visit)
-	switch {
-	case empty == nil:
-		t.root = newNode(dest, source, r)
-	case s == 0:
-		empty.left = newNode(dest, source, r)
-	case s == 1:
-		empty.right = newNode(dest, source, r)
-	}
-
-	// Go back up the path to adjust height and rebalance
-	for i := len(visit) - 1; i >= 0; i-- {
-		// heights
-		updateHeight(visit[i])
-		// balance
-		// Left side heavy
-		if getHeight(visit[i].left)-getHeight(visit[i].right) > 1 {
-			// rotate right
-      if visit[i] == t.root {
-         temp := *visit[i]
-				 t.root = visit[i].left
-				 t.root.right = &temp
-				 updateHeight(t.root.right)
-				updateHeight(t.root)
-			} else {
-         temp := visit[i]
-				 visit[i-1].left = visit[i].left
-				 visit[i].right = temp
-				fmt.Println("Rotation: ", visit[i].right) 
-         updateHeight(visit[i].right)
-				 updateHeight(visit[i])
-			}
-		}
-		// Right side heavy
-		if getHeight(visit[i].left)-getHeight(visit[i].right) < -1 {
-		}
-		//}
-	}
-}
-
-func updateHeight(n *Node) {
-	if n.left == nil && n.right == nil{
-	 n.height = 1
-	}else if n.left == nil {
-		n.height = n.right.height + 1
-	} else if n.right == nil {
-		n.height = n.left.height + 1
-	} else {
-		n.height = max(n.left.height, n.right.height) + 1
-	}
-}
-
-func emptyNode(source int, c *Node, visit *[]*Node) (*Node, int, error) {
-	if c == nil {
-		return c, 0, nil
-	}
-	for true {
-		// Insert
-		if source >= c.lower && c.right == nil {
-			*visit = append(*visit, c)
-			return c, 1, nil
-		}
-		if source < c.lower && c.left == nil {
-			*visit = append(*visit, c)
-			return c, 0, nil
-		}
-		// Move to the next node
-		if source >= c.lower && c.right != nil {
-			*visit = append(*visit, c)
-			c = c.right
-		}
-		if source < c.lower && c.left != nil {
-			*visit = append(*visit, c)
-			c = c.left
-		}
-	}
-	return nil, 0, errors.New("No location found")
-}
-
-func getHeight(n *Node) (h int) {
-	if n != nil {
-		h = n.height
-	}
-	return
-}
-
-func max(a, b int) (m int) {
-	if a >= b {
-		m = a
-	} else {
-		m = b
-	}
-	return
-}
-
-func (t Tree) value(l int) (f int) {
-	return f
-}
-
-func (t Tree) rebalance() {}
