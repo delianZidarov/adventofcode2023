@@ -17,7 +17,6 @@ func main() {
 	}
 
 	f, err := os.Open(args[0])
-	defer f.Close()
 
 	buf := make([]byte, 5745)
 	if err != nil {
@@ -26,10 +25,49 @@ func main() {
 	}
 	f.Read(buf)
 	b := blocks(buf)
-	fmt.Println("******************")
-	fmt.Println(parseSeeds(b[0]))
-	fmt.Println("******************")
-  fmt.Println(string(b[1]))
+	f.Close()
+
+	seeds, err := parseSeeds(b[0])
+	if err != nil {
+		fmt.Println(err)
+	}
+	seedToSoil, err := parseInputMap(b[1])
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	soilToFert, err := parseInputMap(b[2])
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fertToWater, err := parseInputMap(b[3])
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	waterToLight, err := parseInputMap(b[4])
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	lightToTemp, err := parseInputMap(b[5])
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	tempToHumid, err := parseInputMap(b[6])
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	humidToLoc, err := parseInputMap(b[7])
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(seedToSoil, soilToFert, fertToWater, waterToLight,
+		lightToTemp, tempToHumid, humidToLoc, seeds)
+
 	switch p {
 	case 1:
 		fmt.Println("Part 1")
@@ -40,12 +78,44 @@ func main() {
 
 func blocks(buf []byte) (chunks [][]byte) {
 	mid := bytes.Split(buf, []byte("\n\n"))
-	for i := 0; i < len(mid)-1; i++ {
+	for i := 0; i < len(mid); i++ {
 		if len(mid[i]) > 0 {
 			chunks = append(chunks, mid[i])
 		}
 	}
 	return chunks
+}
+
+func parseInputMap(m []byte) (n *Node, err error) {
+	lastNewLine := 0
+	spaces := make([]int, 2)
+	location := 0
+	for i := 0; i < len(m); i++ {
+		switch {
+		case m[i] == ' ':
+			spaces[location%2] = i
+			location += 1
+		case m[i] == '\n' || i+1 == len(m):
+			if lastNewLine > 0 {
+				dest, err := strconv.ParseInt(string(m[lastNewLine+1:spaces[0]]), 10, 64)
+				if err != nil {
+					return nil, err
+				}
+				source, err := strconv.ParseInt(string(m[spaces[0]+1:spaces[1]]), 10, 64)
+				if err != nil {
+					return nil, err
+				}
+				mod, err := strconv.ParseInt(string(m[spaces[1]+1:i]), 10, 64)
+				if err != nil {
+					return nil, err
+				}
+				n = insertNode(n, int(dest), int(source), int(source+mod-1))
+			}
+			lastNewLine = i
+			location = 0
+		}
+	}
+	return n, nil
 }
 
 func parseSeeds(block []byte) (seeds []int, err error) {
