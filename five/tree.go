@@ -1,26 +1,45 @@
 package main
 
+
 type Node struct {
+	dest   int
 	key    int
 	upper  int
-	dest   int
 	height int
 	left   *Node
 	right  *Node
 }
 
+func findDest(n *Node, start int) int {
+	c := n
+	for {
+		if start >= c.key && start <= c.upper {
+			offset := start - c.key
+			return c.dest + offset
+		}
+		if c.left == nil && c.right == nil {
+			return start
+		}
+		if start < c.key {
+			c = c.left
+		} else {
+			c = c.right
+		}
+	}
+}
+
 func newNode(dest, key, upper int) *Node {
 	return &Node{
 		key:    key,
-		upper: upper,
-		dest: dest,
+		upper:  upper,
+		dest:   dest,
 		height: 1,
 		left:   nil,
 		right:  nil,
 	}
 }
 
-func insertNode(n *Node, dest int,key int, upper int) *Node {
+func insertNode(n *Node, dest int, key int, upper int) *Node {
 	if n == nil {
 		n = newNode(dest, key, upper)
 		return n
@@ -33,7 +52,7 @@ func insertNode(n *Node, dest int,key int, upper int) *Node {
 		case key < c.key:
 			v = append(v, c)
 			if c.left == nil {
-				c.left = newNode(dest,key, upper)
+				c.left = newNode(dest, key, upper)
 				search = false
 			} else {
 				c = c.left
