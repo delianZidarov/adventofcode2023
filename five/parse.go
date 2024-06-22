@@ -43,9 +43,14 @@ func parseInputMap(m []byte) (n *Node, err error) {
 					fmt.Println("Parse Maps source: ", string(m[spaces[0]+1:spaces[1]]))
 					return nil, err
 				}
-				mod, err := strconv.ParseInt(string(m[spaces[1]+1:last]), 10, 64)
+				var mod int64
+				if m[last-1] != '\n'{
+				mod, err = strconv.ParseInt(string(m[spaces[1]+1:last]), 10, 64)
+				} else {
+				mod, err = strconv.ParseInt(string(m[spaces[1]+1:last-2]), 10, 64)
+				}
 				if err != nil {
-					fmt.Println("Parse Maps mod: ", string(m[spaces[1]+1:last]), i, spaces)
+					fmt.Println("Parse Maps mod: ", string(m[spaces[1]+1:last]), spaces,i, last)
 					return nil, err
 				}
 				n = insertNode(n, int(dest), int(source), int(source+mod-1))

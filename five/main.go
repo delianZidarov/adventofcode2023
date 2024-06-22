@@ -63,12 +63,29 @@ func main() {
 	if err != nil {
 		fmt.Println("Humid to loc: ", err)
 	}
-	fmt.Println(seedToSoil, soilToFert, fertToWater, waterToLight,
-		lightToTemp, tempToHumid, humidToLoc, seeds)
-	fmt.Println("TEST: ", findDest(seedToSoil, 98))
+
+
 	switch p {
 	case 1:
 		fmt.Println("Part 1")
+		//noting a singed int returns a negative
+		//noting a unsinged int returns the max number
+		//this is too big for a signed int so it needs to 
+		//be right shifted
+		min := int(^uint(0)>>1)
+		for _, seed := range seeds {
+			s := findDest(seedToSoil, seed)
+			s = findDest(soilToFert, s)
+			s = findDest(fertToWater, s)
+			s = findDest(waterToLight, s)
+			s = findDest(lightToTemp, s)
+			s = findDest(tempToHumid, s)
+			s = findDest(humidToLoc, s)
+			if s < min {
+       min = s
+			}
+		}
+		fmt.Println("Lowest Location: ", min)
 	case 2:
 		fmt.Println("Part 2")
 	}

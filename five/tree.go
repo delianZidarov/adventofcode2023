@@ -1,6 +1,5 @@
 package main
 
-
 type Node struct {
 	dest   int
 	key    int
@@ -13,6 +12,12 @@ type Node struct {
 func findDest(n *Node, start int) int {
 	c := n
 	for {
+		if start > c.upper && c.right == nil {
+			return start
+		}
+		if start < c.key && c.left == nil {
+			return start
+		}
 		if start >= c.key && start <= c.upper {
 			offset := start - c.key
 			return c.dest + offset
