@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -82,9 +81,7 @@ func handValue(h string) int {
 
 func handScore(h string) int {
 	hV := handValue(h)
-	fmt.Println("Hand value ", hV)
 	one := cardValue(h[0])
-	fmt.Println("Card one ", one)
 	two := cardValue(h[1])
 	three := cardValue(h[2])
 	four := cardValue(h[3])
