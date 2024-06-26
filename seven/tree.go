@@ -2,85 +2,12 @@ package main
 
 import "fmt"
 
-
 type node struct {
 	value  int
 	bet    int
 	height int
 	left   *node
 	right  *node
-}
-
-func getHeight(n *node) int {
-	if n != nil {
-		return n.height
-	}
-	return 0
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func insertNode(n *node, v int, b int) *node {
-	if n == nil {
-		return newNode(v, b)
-	} else if v < n.value {
-		n.left = insertNode(n.left, v, b)
-	} else if v > n.value {
-		n.right = insertNode(n.right, v, b)
-	} else {
-		return n
-	}
-
-	n.height = 1 + max(getHeight(n.left), getHeight(n.right))
-	balance := getHeight(n.left) - getHeight(n.right)
-
-	// right heavy
-	if balance < -1 {
-		if v > n.right.value {
-			return rotateLeft(n)
-		} else if v < n.right.value {
-			n.right = rotateRight(n.right)
-			return rotateLeft(n)
-		}
-	}
-
-	if balance > 1 {
-		if v < n.left.value {
-			return rotateRight(n)
-		} else if v > n.left.value {
-			n.left = rotateLeft(n.left)
-			return rotateRight(n)
-		}
-	}
-
-	return n
-}
-
-func rotateRight(n *node) *node {
-	t := n.left
-	t1 := t.right
-	n.left = t1
-	t.right = n
-	n.height = 1 + max(getHeight(n.left), getHeight(n.right))
-	t.height = 1 + max(getHeight(n.left), getHeight(n.right))
-
-	return t
-}
-
-func rotateLeft(n *node) *node {
-	t := n.right
-	t1 := t.left
-	n.right = t1
-	t.left = n
-	n.height = 1 + max(getHeight(n.left), getHeight(n.right))
-	t.height = 1 + max(getHeight(n.left), getHeight(n.right))
-
-	return t
 }
 
 func newNode(v, b int) *node {
@@ -93,13 +20,153 @@ func newNode(v, b int) *node {
 	}
 }
 
-func inorderTran(n *node, i *int) {
-	if n.left != nil {
-		inorderTran(n.left, i)
+func inorderTran(n *node, i *int, sum *int) {
+	if n == nil {
+		fmt.Println("Tree empty")
+		return
 	}
-	fmt.Println("Val:", n.value, "Ind: ", *i)
+	if n.left != nil {
+		inorderTran(n.left, i, sum)
+	}
+	// fmt.Println("Val:", n.value, "Ind: ", *i)
+	*sum += n.bet * *i
 	*i += 1
 	if n.right != nil {
-		inorderTran(n.right, i)
+		inorderTran(n.right, i, sum)
 	}
+}
+
+// HERE
+
+func insertNode(n *node, value int, bet int) *node {
+	if n == nil {
+		n = newNode(value, bet)
+		return n
+	}
+	search := true
+	c := n
+	v := make([]*node, 0)
+	for search {
+		switch {
+		case value < c.value:
+			v = append(v, c)
+			if c.left == nil {
+				c.left = newNode(value, bet)
+				search = false
+			} else {
+				c = c.left
+			}
+		case value > c.value:
+			v = append(v, c)
+			if c.right == nil {
+				c.right = newNode(value, bet)
+				search = false
+			} else {
+				c = c.right
+			}
+		}
+		for i := len(v) - 1; i >= 0; i-- {
+			node := v[i]
+			node.height = newHeight(node)
+			balance := height(node.left) - height(node.right)
+			switch {
+			case balance > 1:
+				// base case: if node.left.right is nil then the nodes are
+				// lined up and only one rotation is necessary. Using the height
+				// of the branches generalizes the base case
+				if height(node.left.left) > height(node.left.right) {
+					if i == 0 {
+						// if your are rotating the root node set the return to
+						// the new root after rotating
+						n = rotateRight(node)
+					} else if i > 0 {
+						// if your are not at the root node go one level up and
+						// set the previous left || right node to the new one
+						if v[i-1].left == node {
+							v[i-1].left = rotateRight(node)
+						} else if v[i-1].right == node {
+							v[i-1].right = rotateRight(node)
+						}
+					}
+					// base case: if node.left.left is nil then the nodes are
+					// stagared and two rotations are necessary. Using the height
+					// of the branches generalizes the base case
+				} else if height(node.left.left) < height(node.left.right) {
+					node.left = rotateLeft(node.left)
+					if i == 0 {
+						n = rotateRight(node)
+					} else if i > 0 {
+						if v[i-1].left == node {
+							v[i-1].left = rotateRight(node)
+						} else if v[i-1].right == node {
+							v[i-1].right = rotateRight(node)
+						}
+					}
+				}
+
+			case balance < -1:
+				if height(node.right.right) > height(node.right.left) {
+					if i == 0 {
+						n = rotateLeft(node)
+					} else if i > 0 {
+						if v[i-1].left == node {
+							v[i-1].left = rotateLeft(node)
+						} else if v[i-1].right == node {
+							v[i-1].right = rotateLeft(node)
+						}
+					}
+				} else if height(node.right.right) < height(node.right.left) {
+					node.right = rotateRight(node.right)
+					if i == 0 {
+						n = rotateLeft(node)
+					} else if i > 0 {
+						if v[i-1].left == node {
+							v[i-1].left = rotateLeft(node)
+						} else if v[i-1].right == node {
+							v[i-1].right = rotateLeft(node)
+						}
+					}
+				}
+			}
+		}
+	}
+	return n
+}
+
+func rotateRight(n *node) *node {
+	t := n.left
+	t1 := t.right
+	t.right = n
+	n.left = t1
+	n.height = newHeight(n)
+	t.height = newHeight(t)
+	return t
+}
+
+func rotateLeft(n *node) *node {
+	t := n.right
+	t1 := n.right.left
+	t.left = n
+	n.right = t1
+	n.height = newHeight(n)
+	t.height = newHeight(t)
+	return t
+}
+
+func newHeight(n *node) int {
+	return max(height(n.left), height(n.right)) + 1
+}
+
+func height(n *node) int {
+	if n == nil {
+		return 0
+	}
+	return n.height
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }

@@ -89,3 +89,42 @@ func handScore(h string) int {
 	return hV*int(math.Pow10(10)) + one*int(math.Pow10(8)) +
 		two*int(math.Pow10(6)) + three*int(math.Pow10(4)) + four*int(math.Pow10(2)) + five
 }
+
+func jackScore (h string) int {
+
+return 0
+}
+
+
+func jackCardValue(c byte) int {
+	switch c {
+	case '2':
+		return 2
+	case '3':
+		return 3
+	case '4':
+		return 4
+	case '5':
+		return 5
+	case '6':
+		return 6
+	case '7':
+		return 7
+	case '8':
+		return 8
+	case '9':
+		return 9
+	case 'T':
+		return 10
+	case 'J':
+		return 1
+	case 'Q':
+		return 12
+	case 'K':
+		return 13
+	case 'A':
+		return 14
+	default:
+		return 0
+	}
+}

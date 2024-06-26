@@ -3,17 +3,40 @@ package main
 import (
 	"fmt"
 	"os"
+	"bufio"
+	"strings"
+	"strconv"
 )
 
 func main() {
 	args := os.Args[1:]
-	fmt.Println("ARGS ", args)
-	t := insertNode(nil, 1, 2)
-	for i := 2; i < 11; i++{
-   t = insertNode(t, i,2)
+	path := args[0]
+	part := args[1]
+
+	f, err := os.Open(path)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
-	t = insertNode(t, 0, 2)
-	t = insertNode(t,23,2)
-	i :=0
-	inorderTran(t, &i)
+
+	var games *node
+	scanner := bufio.NewScanner(f)
+  for scanner.Scan(){
+		s := strings.Split(scanner.Text(), " ")
+		var value int 
+		if part == "1" {
+		value = handScore(s[0])
+		}
+		bet, err := strconv.ParseInt(s[1],10,64)
+		if err != nil {
+     fmt.Println(err)
+			os.Exit(1)
+		}
+		games = insertNode(games, value,int(bet))
+	}
+	f.Close()
+	i := 1
+	sum := 0
+	inorderTran(games, &i, &sum)
+  fmt.Println("The total is: ", sum)
 }
