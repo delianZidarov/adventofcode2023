@@ -22,13 +22,12 @@ func newNode(v, b int) *node {
 
 func inorderTran(n *node, i *int, sum *int) {
 	if n == nil {
-		fmt.Println("Tree empty")
+		fmt.Println("Tree is empty")
 		return
 	}
 	if n.left != nil {
 		inorderTran(n.left, i, sum)
 	}
-	// fmt.Println("Val:", n.value, "Ind: ", *i)
 	*sum += n.bet * *i
 	*i += 1
 	if n.right != nil {
