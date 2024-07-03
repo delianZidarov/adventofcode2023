@@ -16,13 +16,18 @@ func main() {
 	for _, d := range dir {
 		result, ok := route(cord{row: c.row + d[0], col: c.col + d[1]}, &m, h)
 		if ok {
-			fmt.Println("The route: ", result)
-			fmt.Println("Part one: ", len(result)/2)
+			fmt.Println("Part One: ", len(result)/2)
+			// pick's theorem: given the integer cordinates of a shapes border (b)
+			// and the number of points inside (i); we can calculate the area of a
+			// shape: A = i + (b/2) -1
+			// shoelace formula: way to calculate the area of a simple polygon by
+			// cross multiplying and subtracting vertices: .5 * x1 * y2 - y1 * x2 ... xn * y1 - yn * x1
+			// once the area is calculated we can solve for i, the answer to part 2
+			// i = A - (b/2) + 1
+			fmt.Println("Part Two: ", lace(result)-(len(result)/2)+1)
 			break
 		}
 	}
-
-	fmt.Println("Is this the start = ", string(m[c.row][c.col]))
 }
 
 type cord struct {
@@ -170,4 +175,18 @@ func parseInput(s string) ([][]byte, cord) {
 	m = append(m, buf[lastWrite:end])
 
 	return m, cord{row, col}
+}
+
+func lace(vert []cord) int {
+	vert = append(vert, vert[0])
+	area := 0
+	for i := 0; i < len(vert) -1 ; i++ {
+		// the last vert is cross multiplied with the first
+			area = area + vert[i].col*vert[i+1].row - vert[i].row*vert[i+1].col
+	}
+	if area < 0 {
+		return (area * -1) / 2
+	} else {
+		return (area) / 2
+	}
 }
