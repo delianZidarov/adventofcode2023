@@ -180,9 +180,9 @@ func parseInput(s string) ([][]byte, cord) {
 func lace(vert []cord) int {
 	vert = append(vert, vert[0])
 	area := 0
-	for i := 0; i < len(vert) -1 ; i++ {
+	for i := 0; i < len(vert)-1; i++ {
 		// the last vert is cross multiplied with the first
-			area = area + vert[i].col*vert[i+1].row - vert[i].row*vert[i+1].col
+		area = area + vert[i].col*vert[i+1].row - vert[i].row*vert[i+1].col
 	}
 	if area < 0 {
 		return (area * -1) / 2
