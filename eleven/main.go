@@ -6,11 +6,14 @@ import (
 )
 
 func main() {
+	// TEST
+	// points, rowGaps, columnGaps := parse("/home/d/Documents/test")
+	// TEST
+
 	points, rowGaps, columnGaps := parse("/home/d/Documents/day11")
 
-	fmt.Println(rowGaps)
-	fmt.Println(columnGaps)
-	fmt.Println("Star locations: ", points)
+	expanded := expandOrd(points, rowGaps, columnGaps)
+	fmt.Println("Part 1: ", sumOfDistance(expanded))
 }
 
 type ord struct {
@@ -55,11 +58,11 @@ func parse(s string) ([]ord, []int, []int) {
 		if buf[i] == '#' {
 			row := 0
 			if lnLength > 0 && i > lnLength {
-        row = i / lnLength
+				row = i / lnLength
 			}
 			column := i
 			if lnLength > 0 {
-      column = i % lnLength
+				column = i % lnLength
 			}
 			points = append(points, ord{row: row, col: column})
 			metStar += 1
@@ -67,7 +70,7 @@ func parse(s string) ([]ord, []int, []int) {
 	}
 	for i := 0; i < len(m[0]); i++ {
 		metStar = 0
-		for j := 0; j < len(m)-1; j++ {
+		for j := 0; j < len(m); j++ {
 			if m[j][i] == '#' {
 				metStar += 1
 			}
@@ -78,4 +81,50 @@ func parse(s string) ([]ord, []int, []int) {
 	}
 
 	return points, rowGaps, columnGaps
+}
+
+func expandOrd(startingPoints []ord, rowGaps []int, columnGaps []int) []ord {
+	newPoints := make([]ord, 0)
+	for _, p := range startingPoints {
+		rowOffset := 0
+		columnOffset := 0
+		for _, i := range rowGaps {
+			if p.row > i {
+				rowOffset += 1
+			} else {
+				break
+			}
+		}
+
+		for _, i := range columnGaps {
+			if p.col > i {
+				columnOffset += 1
+			} else {
+				break
+			}
+		}
+		newPoints = append(newPoints, ord{row: p.row + rowOffset, col: p.col + columnOffset})
+	}
+	return newPoints
+}
+
+func sumOfDistance(points []ord) int {
+	sum := 0
+	for i := 0; i < len(points)-1; i++ {
+		for j := i + 1; j < len(points); j++ {
+			sum = sum + ordDistance(points[i], points[j])
+		}
+	}
+	return sum
+}
+
+func ordDistance(a, b ord) int {
+	return abs(a.col-b.col) + abs(a.row-b.row)
+}
+
+func abs(a int) int {
+	if a < 0 {
+		return a * -1
+	}
+	return a
 }
