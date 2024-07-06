@@ -7,13 +7,14 @@ import (
 
 func main() {
 	// TEST
-	// points, rowGaps, columnGaps := parse("/home/d/Documents/test")
+	//points, rowGaps, columnGaps := parse("/home/d/Documents/test")
 	// TEST
 
 	points, rowGaps, columnGaps := parse("/home/d/Documents/day11")
 
-	expanded := expandOrd(points, rowGaps, columnGaps)
+	expanded := expandOrd(1, points, rowGaps, columnGaps)
 	fmt.Println("Part 1: ", sumOfDistance(expanded))
+	fmt.Println("Part 2: ", sumOfDistance(expandOrd(1000000, points, rowGaps, columnGaps)))
 }
 
 type ord struct {
@@ -83,7 +84,7 @@ func parse(s string) ([]ord, []int, []int) {
 	return points, rowGaps, columnGaps
 }
 
-func expandOrd(startingPoints []ord, rowGaps []int, columnGaps []int) []ord {
+func expandOrd(eFactor int, startingPoints []ord, rowGaps []int, columnGaps []int) []ord {
 	newPoints := make([]ord, 0)
 	for _, p := range startingPoints {
 		rowOffset := 0
@@ -103,7 +104,11 @@ func expandOrd(startingPoints []ord, rowGaps []int, columnGaps []int) []ord {
 				break
 			}
 		}
-		newPoints = append(newPoints, ord{row: p.row + rowOffset, col: p.col + columnOffset})
+		if eFactor > 1 {
+			newPoints = append(newPoints, ord{row: p.row + (rowOffset * (eFactor - 1)), col: p.col + (columnOffset * (eFactor - 1))})
+		} else {
+			newPoints = append(newPoints, ord{row: p.row + (rowOffset * eFactor), col: p.col + (columnOffset*eFactor - 1)})
+		}
 	}
 	return newPoints
 }
