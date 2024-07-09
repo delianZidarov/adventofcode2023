@@ -14,7 +14,7 @@ func main() {
 	// TEST
 	// f, _ := os.Open("/home/d/Documents/day12")
 	scanner := bufio.NewScanner(f)
-	l, _ := regexp.Compile("[?#]+")
+	l, _ := regexp.Compile("[?#.]+")
 	n, _ := regexp.Compile("[0-9]+")
 	for scanner.Scan() {
 		in := l.FindAllString(scanner.Text(), -1)
@@ -39,13 +39,11 @@ func main() {
 	fmt.Println(t, ok, "Expected  2 - 1")
 	t, ok = combinations([]string{"???"}, []int{1, 1}, &m)
 	fmt.Println(t, ok, "Expected 1 -1")
-	t, ok = combinations([]string{"????"}, []int{1,1}, &m)
+	t, ok = combinations([]string{"????"}, []int{1, 1}, &m)
 	fmt.Println(t, ok, "Expected 3 - 1")
-	t, ok = combinations([]string{"????"}, []int{2,1}, &m)
+	t, ok = combinations([]string{"????"}, []int{2, 1}, &m)
 	fmt.Println(t, ok, "Expected 1 - 1")
-
 }
-
 
 func factorial(a int, mem *map[int]int) int {
 	// assert that a is less than 21, higher values overflow
@@ -70,35 +68,7 @@ func factorial(a int, mem *map[int]int) int {
 	}
 }
 
-func combinations(chunk []string, spec []int, mem *map[int]int) (c int, ok bool) {
-	if len(chunk) == 0 && len(spec) != 0 {
-		c = 0
-		ok = false
-		return
-	}
-
-	if allMaybe(chunk[0]) {
-		// if we are trying to fit more than one broken sequence in the space
-		// we need to subtract one space for each extra broken sequence
-		spacerSpaces := len(spec) - 1
-		sequenceLengths := sequenceLengthModifier(spec)
-		spaces := len(chunk[0]) - spacerSpaces - sequenceLengths
-		// find all possible combinations
-		if spaces == len(spec) {
-			c = 0
-			ok = true
-			return
-		} else {
-			comb := factorial(spaces, mem) / (factorial(spaces-len(spec), mem) * factorial(len(spec), mem))
-			c = comb - 1
-			ok = true
-			return
-		}
-	}
-
-	return 0, false
-}
-
+// check to see if the input chunk is all question marks
 func allMaybe(s string) bool {
 	b := true
 	for _, c := range s {
@@ -114,4 +84,64 @@ func sequenceLengthModifier(spec []int) int {
 		sum += n - 1
 	}
 	return sum
+}
+
+func comb(in string, specs []int, m *map[int]int) (int, bool) {
+	if len(specs) == 0 && len(in) == 0 {
+		return 0
+	}
+	if len(specs) == 1 {
+	}
+}
+
+func findComb(in string, spec []int, m *map[int]int) (int, []string, bool) {
+	bigestIdx:= 0
+	biggestVal :=0
+
+   // if the string is all ?
+   if allMaybe(in) {
+     spaces := len(in) - sequenceLengthModifier(spec) - (len(spec) - 1 )
+		 pieces := len(spec)
+		 if spaces == pieces {
+     return 0, []string{""}, true 
+		 } else {
+      n := factorial(spaces, m) / (factorial((spaces - pieces), m) * factorial(pieces, m))
+			if n > 0 {
+			return n, []string{""},true
+			} else {
+       return 0, []string{""},false
+			}
+		}
+ 
+  	}
+
+
+
+	//find the location of the biggest chunk
+	for i, v := range spec {
+    if v > biggestVal {
+      bigestIdx = i
+			biggestVal = v
+		}
+	}
+ 
+	// construct the slider
+  var brokenPieceLocation int
+	for i,c := range in {
+   if c == '.' {
+     brokenPieceLocation = i
+		}
+	}
+
+}
+
+func validatePlacement(subS string) bool {
+	v := true && (subS[0] == '.' || subS[0] == '?') &&
+		(subS[len(subS)-1] == '.' || subS[len(subS)-1] == '?')
+	return v
+}
+
+type slider struct {
+	rBound int
+	lBound int
 }
