@@ -6,7 +6,6 @@ import (
 	"os"
 	"regexp"
 	"strconv"
-	"slices"
 )
 
 func main() {
@@ -21,7 +20,7 @@ func main() {
 		in := l.FindString(scanner.Text())
 		c := n.FindAllString(scanner.Text(), -1)
 		spec := make([]int, len(c))
-		//m := make(map[int]int)
+		// m := make(map[int]int)
 
 		for i, s := range c {
 			num, err := strconv.ParseInt(s, 10, 64)
@@ -31,55 +30,80 @@ func main() {
 			}
 			spec[i] = int(num)
 		}
-   
+		fmt.Println("doing", in, spec)
 		comb(in, spec)
 
 	}
 }
 
-
 type car struct {
-  front int
-	back  int
-	track *string
-	lastValStop *car
-  valStops *[]car
+	front  int
+	back   int
+	track  *string
+	valLoc bool
+	sFront int
+	sBack  int
+
+	valStops *[]car
 }
 
-
-
-
-
-func (c *car) run(end int) {
-   loc := make([]car, 0)
-	for c.front <= end {
-    if c.validate() {
-     loc = append(loc, *c)
-		}
-    c.front += 1
-		c.back += 1
+func comb(t string, specs []int) {
+	track := "." + t + "."
+	cars := newCars(specs, &track)
+	end := len(track) - 1
+	for i := len(cars) - 1; i >= 0; i-- {
+		cars[i].run(end)
+		end = (*cars[i].valStops)[len(*cars[i].valStops)-1].back
 	}
 
+	validStops := make([][]car, 0)
+	for i := 0; i < len(cars); i++ {
+		validStops = append(validStops, *cars[i].valStops)
+	}
 
+	fmt.Println(validStops)
 }
 
-func (c *car) validate() bool {
- r, _ := regexp.Compile("^[.?][?#][.?] $")
- return r.Match([]byte( (*c.track)[c.back : c.front+1]))
+func (c *car) move(mod int) {
+	c.front += mod
+	c.back += mod
+	c.validate()
 }
 
-func newCars (specs []int, t *string) []car {
+func (c *car) reset() {
+ c.front = c.sFront
+ c.back = c.sBack
+}
+
+func (c *car) run(end int) {
+	loc := make([]car, 0)
+	for c.front <= end {
+		if c.valLoc {
+			loc = append(loc, *c)
+		}
+		c.front += 1
+		c.back += 1
+	}
+	c.valStops = &loc
+}
+
+func (c *car) validate() {
+	r, _ := regexp.Compile("^[.?][?#]+[.?]$")
+	c.valLoc = r.Match([]byte((*c.track)[c.back : c.front+1]))
+}
+
+func newCars(specs []int, t *string) []car {
 	cars := make([]car, 0)
 	lastFront := 0
 	for _, c := range specs {
-    //we adjust the length of the car by +2 for the spacers and -1 because arrays 
-		//start at zero 
+		// we adjust the length of the car by +2 for the spacers and -1 because arrays
+		// start at zero
 		newFront := lastFront + c + 1
-		cars = append(cars, car{front: newFront, back: lastFront, track: t })
-    lastFront = newFront
+		cars = append(cars, car{front: newFront, back: lastFront, track: t, sFront: newFront, sBack: lastFront})
+		lastFront = newFront - 1
 	}
-  return cars
-} 
+	return cars
+}
 
 func factorial(a int, mem *map[int]int) int {
 	// assert that a is less than 21, higher values overflow
@@ -108,4 +132,3 @@ func factorial(a int, mem *map[int]int) int {
 		return b
 	}
 }
-
