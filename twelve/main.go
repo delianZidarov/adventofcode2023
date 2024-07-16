@@ -32,7 +32,7 @@ func main() {
 		}
 		fmt.Println("doing", in, spec)
 	}
-	comb(".??..?##?", []int{1, 3})
+	comb("????", []int{1})
 }
 
 // the numbers of provided in the input become the state machine
@@ -44,47 +44,69 @@ func automata(spec []int) string {
 		}
 		state += "."
 	}
-	return state
+	return state[:len(state)-1]
+}
+
+func reducer (a []int, state int) int {
+	sum := 0
+	for _, v := range a {
+   if v == state {
+     sum += 1
+		}
+	}
+ return sum
 }
 
 func comb(in string, spec []int) int {
-	stateMachine := automata(spec)
+	headArray := make([]int, 1)
 
-	// we start with one default state, the 0
-	// since this a NFA we need to make sure to keep track
-	// of branching. This can be done recursively making 2
-	// branches or by keeping track of states. As we proggress
-	// through the machine the state array gets larger. At each
-	// input we assume we are at every already visited state
-	visitedStates := make([]int,0)
-	visitedStates = append(visitedStates, 1)
-	// go through every input for the state Machine
-	for _, c := range in {
-		fmt.Println("Checking char", string(c))
-		for i := range visitedStates {
-			if transition(i, stateMachine, byte(c)) {
-				lastVisited := len(visitedStates) - 1
-				if lastVisited <= i {
-					visitedStates = append(visitedStates, 1)
-				} else {
-					visitedStates[i] += 1
+	machine := automata(spec)
+	for _, input := range in {
+		for j, head := range headArray {
+			if head < len(machine)-1 {
+
+				currentState := machine[head]
+				nextState := machine[head+1]
+				fmt.Println("input", string(input), "head", head, "current", string(currentState), "next", string(nextState), "HEADS", headArray)
+				if input == rune(nextState) {
+					headArray[j] += 1
+				}
+				// erase heads
+				if currentState == '#' &&
+					nextState == '.' &&
+					input == '#' {
+					headArray = append(headArray[:j], headArray[j+1:]...)
+				}
+				if currentState == '#' &&
+					nextState == '#' &&
+					input == '?' {
+					headArray[j] += 1
+				}
+				if currentState == '#' &&
+					nextState == '.' &&
+					input == '?' {
+					headArray[j] += 1
+				}
+				// this is branch in the state machine, a new head is created at the
+				// current location and the original head is advanced one position
+				if currentState == '.' &&
+					input == '?' {
+					fmt.Println(head)
+					headArray = append(headArray, headArray[j])
+					headArray[j] += 1
+
 				}
 			}
-		}
-		fmt.Println("State after checking the char", visitedStates, "first",visitedStates[0])
-	}
-	fmt.Println("State Machine:", stateMachine, "Intput", in)
-	fmt.Println("How is it looking", visitedStates, "last position", len(stateMachine)-1)
-	return 0
-}
+			// The end is gauranteed to be a "." so it should only accept "." or "#"
+			if head == len(machine)-1 &&
+				input == '#' {
+				headArray = append(headArray[:j], headArray[j+1:]...)
+			}
+			fmt.Println("End of loops", headArray)
 
-func transition(curLoc int, state string, in byte) bool {
-	lastPosition := len(state) - 1
-	if curLoc >= lastPosition {
-		return false
+		}
 	}
-	if in == state[curLoc+1] || in == '?' {
-		return true
-	}
-	return false
+	fmt.Println("Possible answer?", reducer(headArray,len(machine) -1))
+
+	return 0
 }
