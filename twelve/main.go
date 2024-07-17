@@ -21,7 +21,7 @@ func main() {
 		c := n.FindAllString(scanner.Text(), -1)
 		spec := make([]int, len(c))
 		// m := make(map[int]int)
-
+		sum := 0
 		for i, s := range c {
 			num, err := strconv.ParseInt(s, 10, 64)
 			if err != nil {
@@ -31,8 +31,11 @@ func main() {
 			spec[i] = int(num)
 		}
 		fmt.Println("doing", in, spec)
+		sum += comb(in, spec)
 	}
-	comb("????", []int{1})
+	fmt.Println("TEST")
+	//.#.#.###.
+	comb(".??..??...?##.", []int{1,1,3})
 }
 
 // the numbers of provided in the input become the state machine
@@ -47,14 +50,25 @@ func automata(spec []int) string {
 	return state[:len(state)-1]
 }
 
-func reducer (a []int, state int) int {
+func reducer(a []int, state int) int {
 	sum := 0
 	for _, v := range a {
-   if v == state {
-     sum += 1
+		if v == state {
+			sum += 1
 		}
 	}
- return sum
+	return sum
+}
+
+func delHead(a []int, idx int) []int {
+  n := make([]int, 0)
+	for i, v := range a {
+   if i == idx {
+     continue
+		}
+		n = append(n, v)
+	}
+	return n
 }
 
 func comb(in string, spec []int) int {
@@ -62,20 +76,23 @@ func comb(in string, spec []int) int {
 
 	machine := automata(spec)
 	for _, input := range in {
-		for j, head := range headArray {
-			if head < len(machine)-1 {
-
+		 nHeads := make([]int,0)
+		 writeNHead := false
+		fmt.Println(headArray, "INPUT", string(input))
+		for j:=0; j < len(headArray); j++{
+			head := headArray[j]
+			if head < len(machine)-1 && j < len(headArray) {
 				currentState := machine[head]
 				nextState := machine[head+1]
-				fmt.Println("input", string(input), "head", head, "current", string(currentState), "next", string(nextState), "HEADS", headArray)
 				if input == rune(nextState) {
 					headArray[j] += 1
 				}
+
 				// erase heads
 				if currentState == '#' &&
 					nextState == '.' &&
 					input == '#' {
-					headArray = append(headArray[:j], headArray[j+1:]...)
+					headArray = delHead(headArray, j)
 				}
 				if currentState == '#' &&
 					nextState == '#' &&
@@ -85,28 +102,32 @@ func comb(in string, spec []int) int {
 				if currentState == '#' &&
 					nextState == '.' &&
 					input == '?' {
+					fmt.Println("something funcky", headArray)
 					headArray[j] += 1
+					fmt.Println("something funcky 2", headArray)
 				}
 				// this is branch in the state machine, a new head is created at the
 				// current location and the original head is advanced one position
 				if currentState == '.' &&
 					input == '?' {
-					fmt.Println(head)
-					headArray = append(headArray, headArray[j])
+					nHeads =append(nHeads, headArray[j])
 					headArray[j] += 1
+					writeNHead = true
 
 				}
 			}
 			// The end is gauranteed to be a "." so it should only accept "." or "#"
 			if head == len(machine)-1 &&
 				input == '#' {
-				headArray = append(headArray[:j], headArray[j+1:]...)
+				headArray = delHead(headArray, j)
 			}
-			fmt.Println("End of loops", headArray)
-
 		}
-	}
-	fmt.Println("Possible answer?", reducer(headArray,len(machine) -1))
+    if writeNHead {
+      headArray= append(headArray, nHeads ...)
+		}
 
-	return 0
+	}
+	fmt.Println("Possible answer?", headArray, reducer(headArray, len(machine)-1))
+
+	return reducer(headArray, len(machine)-1)
 }
