@@ -35,7 +35,7 @@ func main() {
 	}
 	fmt.Println("TEST")
 	//.#.#.###.
-	comb(".??..??...?##.", []int{1,1,3})
+	comb("?#?#?#?#?#?#?#?", []int{1,3,1,6})
 }
 
 // the numbers of provided in the input become the state machine
@@ -78,14 +78,17 @@ func comb(in string, spec []int) int {
 	for _, input := range in {
 		 nHeads := make([]int,0)
 		 writeNHead := false
-		fmt.Println(headArray, "INPUT", string(input))
+		fmt.Println(headArray, "INPUT", string(input), len(headArray), "first location", headArray[0])
 		for j:=0; j < len(headArray); j++{
 			head := headArray[j]
 			if head < len(machine)-1 && j < len(headArray) {
 				currentState := machine[head]
 				nextState := machine[head+1]
+				fmt.Println("Cur", string(currentState),"Next", string(nextState), "In", string(input), "J", j)
 				if input == rune(nextState) {
+					fmt.Println("Something funky", headArray)
 					headArray[j] += 1
+					fmt.Println("Something funky 2", headArray)
 				}
 
 				// erase heads
@@ -102,9 +105,7 @@ func comb(in string, spec []int) int {
 				if currentState == '#' &&
 					nextState == '.' &&
 					input == '?' {
-					fmt.Println("something funcky", headArray)
 					headArray[j] += 1
-					fmt.Println("something funcky 2", headArray)
 				}
 				// this is branch in the state machine, a new head is created at the
 				// current location and the original head is advanced one position
@@ -130,4 +131,19 @@ func comb(in string, spec []int) int {
 	fmt.Println("Possible answer?", headArray, reducer(headArray, len(machine)-1))
 
 	return reducer(headArray, len(machine)-1)
+}
+type head struct {
+  current int
+	next   *head
+	prev   *head
+}
+
+func (h *head) Delete () {
+  h.prev.next = h.next
+}
+
+func addHead (h *head, current int) *head {
+ nHead := head{current : current, next: h}
+ h.prev = &nHead
+ return &nHead
 }
